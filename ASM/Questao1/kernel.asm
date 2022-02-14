@@ -1,107 +1,44 @@
-org 0x7e00
+org 0x7c00
 jmp 0x0000:start
 
 data:
-    posCol: dd 0x00
-    posLin: dd 0x00
-    color: db 0x00
-    savingAddress: db 0x00
+    imagem db 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 8, 8, 8, 8, 9, 1, 8, 8, 8, 8, 1, 8, 0, 0, 0, 0, 0, 0, 8, 8, 9, 9, 9, 9, 8, 9, 9, 8, 0, 0, 0, 0, 0, 0, 8, 1, 9, 9, 15, 15, 9, 9, 9, 8, 0, 0, 0, 0, 0, 0, 8, 9, 9, 9, 9, 9, 9, 9, 9, 1, 0, 0, 0, 0, 0, 0, 8, 9, 15, 15, 15, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 8, 9, 9, 9, 15, 15, 9, 9, 9, 8, 0, 0, 0, 0, 8, 8, 8, 8, 1, 9, 9, 9, 9, 8, 8, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 8, 1, 9, 9, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-getchar:
-    mov ah, 0x00
-    int 16h
+start: 
+    xor ax, ax
+    xor bx, bx 
+    xor cx, cx ;Vou usar como x
+    xor dx, dx ;Vou usar como y
+    mov ds, ax
+    mov es, ax
 
-stringToInt:
-    pop ax ;retirando o comando inicial
-    mov [savingAddress], al;
+    mov ah, 00h ;Começar O Modo de Video
+    mov al, 13h
+    int 10h
 
-    .loop2:
-        pop ax
-        mov [color], al
+    mov si, imagem
 
-        pop ax
-        cmp al, 'e'
-        jne .add10
-
-    .add10:
-        mov al, 0x0a
-        add [color], al ;adicionei a casa decimal extra
-        jmp .finish
-
-    .finish:
-        mov ax, 0x30
-        sub [color], ax ;deixando o valor em inteiro
-
-
-
-    push savingAddress
-    ret
-
-getstring:
     .loop1:
-        call getchar
-        cmp al, 0x20 ;se for igual a espaço (' '), pule para o próximo loop
-        je .loop1
-        cmp al, 0x2C ;Se for igual a ,
-        je .virgula
-        jne .save
+        lodsb
+        mov ah, 0Ch ;Printar o pixel
+        int 10h
 
-        .save:
-            push ax
+        inc cx
+        cmp cx, 16
+        je .mudarDeLinha
+        jmp .loop1
+        .mudarDeLinha:
+            mov cx, 0
+            inc dx
+            cmp dx, 16
+            je .endloop1
             jmp .loop1
-            
-        .virgula:
-            call stringToInt
-            mov al, 'e'
-            push ax
-            call printarPixel
-            jmp .loop1
-        
 
-printarPixel:
-    mov ah, 0Ch
-    mov al, [color]
-    mov bh, 00h
-    mov cx, [posLin]
-    mov dx, [posCol]
-    int 10h
-
-    mov ax, 0Fh
-    cmp [posCol], ax
-    je .pulaLinha
-    jne .pulaColuna
-
-    .pulaLinha:
-        mov ax, [posLin]
-        inc ax
-        mov [posLin], ax
-        mov ax, 00h
-        mov [posCol], ax
-        ret
-    .pulaColuna:
-        mov ax, [posCol]
-        inc ax
-        mov [posCol], ax
-        ret
-
-
-start:
-    mov ah, 00h
-    mov al, 04h ;Escolhendo modo
-    int 10h ; executando
-
-    ;setando o fundo de branco
-    mov ah, 06h
-    mov al, 00h
-    mov bh, 0Fh
-    mov ch, 00h
-    mov cl, 00h
-    mov dh, 0Fh
-    mov dl, 0Fh
-    int 10h
-
-    
-    call getstring
+        .endloop1:
+            jmp .end
    
+.end:
+    jmp $
 
-jmp $
+times 510 - ($ - $$) db 0
+dw 0xaa55

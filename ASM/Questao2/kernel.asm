@@ -42,7 +42,7 @@ getstring:
         je .primeiraVez
 
         call getchar ; Leio
-        cmp al, 0x0d ; O caractere lido foi backspace?
+        cmp al, 0x0d ; O caractere lido foi enter?
         je .teclaEnter
         cmp cl, 49
         je .loop1
