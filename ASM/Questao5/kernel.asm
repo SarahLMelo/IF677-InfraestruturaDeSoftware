@@ -2,8 +2,9 @@ org 0x7E00
 jmp 0x0000:start
 
 data:
-    string times 30 db 'Malu é uma ótima monitora',0
-    color times 4 db 0
+    string times 30 db 'Malu e uma otima monitora',0
+    number times 4 db 0
+    savedColor db 0
 
 getchar:
   mov ah, 0x00
@@ -31,13 +32,19 @@ endl:
   call putchar
   ret
 
+putcolorchar:
+  mov ah, 0Eh
+  mov bl, [savedColor]
+  int 10h
+
+  ret
 
 prints:             ; mov si, string
   .loop:
     lodsb           ; bota character em al 
     cmp al, 0
     je .endloop
-    call putchar
+    call putcolorchar
     jmp .loop
   .endloop:
   ret
@@ -99,7 +106,7 @@ start:
     mov es, ax
 
     mov ah, 00h
-    mov al, 03h
+    mov al, 13h
     int 10h
 
     mov di, number
@@ -108,6 +115,9 @@ start:
     mov si, number
     call stoi
 
-    
+    mov [savedColor], al
+
+    mov si, string
+    call prints
 
 jmp $
