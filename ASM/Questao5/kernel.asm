@@ -18,23 +18,31 @@ putchar:
 
 delchar:
   mov al, 0x08          ; backspace
-  call putchar
+  call putcolorchar
   mov al, ' '
-  call putchar
+  call putcolorchar
   mov al, 0x08          ; backspace
-  call putchar
+  call putcolorchar
   ret
   
 endl:
   mov al, 0x0a          ; line feed
-  call putchar
+  call putcolorchar
   mov al, 0x0d          ; carriage return
-  call putchar
+  call putcolorchar
   ret
 
 putcolorchar:
   mov ah, 0Eh
-  mov bl, [savedColor]
+  cmp dx, 0
+  je .colored
+  mov bl, 15
+  jmp .end
+  
+  .colored:
+    mov bl, [savedColor]
+
+  .end:
   int 10h
 
   ret
@@ -51,6 +59,7 @@ prints:             ; mov si, string
 
 gets:                 ; mov di, string
   xor cx, cx          ; zerar contador
+  mov dx, 1
   .loop1:
     call getchar
     cmp al, 0x08      ; backspace
@@ -62,7 +71,7 @@ gets:                 ; mov di, string
     
     stosb
     inc cl
-    call putchar
+    call putcolorchar
     
     jmp .loop1
     .backspace:
@@ -118,6 +127,7 @@ start:
     mov [savedColor], al
 
     mov si, string
+    mov dx, 0
     call prints
 
 jmp $
