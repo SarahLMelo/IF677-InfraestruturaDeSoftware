@@ -110,11 +110,22 @@ start:
 
     mov si, number
     call stoi
-    
+
+    mov bx, ax
     mov si, string
-    mov bx, [number]
-    add si, bx
-    lodsb
+
+    .loop2:
+      ;call putchar
+      cmp bx, 0
+      je .endloop2
+      
+      dec bx
+      lodsb
+      jmp .loop2
+
+      .endloop2:
+
+
     call putchar
 
 jmp $
