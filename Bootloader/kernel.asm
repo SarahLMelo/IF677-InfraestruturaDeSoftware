@@ -3,11 +3,8 @@ jmp 0x0000:start
 
 data:
     emptyString times 7 db '______',0
-    chosenWord times 7 db 0
+    chosenWord times 7 db 'ENIGMA',0
     writenString times 7 db 0
-
-    freqArray times 26 db 0
-
 
 readchar:
   mov ah, 0x00
@@ -140,6 +137,97 @@ prints:             ; mov si, string
   .endloop2:
   ret
 
+checkWord:
+  mov si, writenString
+  xor cx, cx
+  push cx
+  
+  .loop3:
+    lodsb
+    cmp al, 0
+    je .endloop3
+
+    cmp al, 'E'
+    je .E
+
+    cmp al, 'N'
+    je .N
+
+    cmp al, 'I'
+    je .I
+
+    cmp al, 'G'
+    je .G
+
+    cmp al, 'M'
+    je .M
+
+    cmp al, 'A'
+    je .A
+
+    jmp .notInTheWord
+
+  .E:
+    pop cx
+    cmp cx, 0
+    je .right
+    jmp .wrongPlace
+
+  .N:
+    pop cx
+    cmp cx, 1
+    je .right
+    jmp .wrongPlace
+
+  .I:
+    pop cx
+    cmp cx, 2
+    je .right
+    jmp .wrongPlace
+
+  .G:
+    pop cx
+    cmp cx, 3
+    je .right
+    jmp .wrongPlace
+
+  .M:
+    pop cx
+    cmp cx, 4
+    je .right
+    jmp .wrongPlace
+
+  .A:
+    pop cx
+    cmp cx, 5
+    je .right
+    jmp .wrongPlace
+
+  .notInTheWord:
+    pop cx
+    inc cx
+    push cx
+    mov bl, 0x04 ;Deixando vermelho
+    call putchar
+    jmp .loop3
+
+  .right:
+    inc cx
+    push cx
+    mov bl, 0x02 ;Deixando verde
+    call putchar
+    jmp .loop3
+
+  .wrongPlace:
+    inc cx
+    push cx
+    mov bl, 0x0E ;Deixando amarelo
+    call putchar
+    jmp .loop3
+
+  .endloop3:
+  pop cx
+  ret
 
 round:
     mov si, emptyString
@@ -152,7 +240,10 @@ round:
     call readString
 
     call lineBegin
+    call checkWord
+
     call endl
+    call lineBegin
 
     jmp round;
 
