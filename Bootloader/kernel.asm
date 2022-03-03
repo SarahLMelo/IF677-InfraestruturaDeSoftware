@@ -1,4 +1,4 @@
-org 0x7E00
+org 0x8600
 jmp 0x0000:start
 
 data:
@@ -122,6 +122,7 @@ startVideo:
     int 10h
 
     mov ah, 02h
+    mov bh, 01h
     mov dl, 17
     int 10h
 
@@ -229,6 +230,7 @@ checkWord:
   pop cx
   ret
 
+;ajeitar a condição de parada!
 round:
     mov si, emptyString
     mov bl, 0x0F
@@ -248,6 +250,7 @@ round:
     jmp round;
 
 
+
 start:
     xor ax, ax
     xor bx, bx
@@ -257,6 +260,7 @@ start:
     mov es, ax
     
     call startVideo
+
     call round
 
 
