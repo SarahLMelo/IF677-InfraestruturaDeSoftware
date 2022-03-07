@@ -4,8 +4,16 @@ jmp 0x0000:start
     nomeJogo times 9 db 'AMGINE', 0
     inicio db 'Pressione ENTER para iniciar', 0
     pcGenio db '          -----', 0 
-    detalhes db 'A palavra secreta possui 6 letras', 0
-    detalhes1 db '(todas diferentes)', 0 
+    texto1 db 'Regras do jogo:', 0
+    texto2 db '1- Voce possui 6 tentativas para acertar a palavra secreta', 0
+    texto3 db '2- A palavra possui todas as letras      diferentes!', 0
+    texto4 db '3- Se a palavra possuir a letra e ela   estiver no lugar certo, sera pintada de', 0
+    texto5 db '4- Se a palavra possuir a letra mas ela estiver no lugar errado, sera pintada   de', 0
+    texto6 db '5- Se a palavra nao possuir a letra,    sera pintada de', 0
+    verde db 'VERDE', 0
+    amarelo db 'AMARELO', 0
+    vermelho db 'VERMELHO', 0
+
 
 prints:             ; mov si, string
   .loop2:
@@ -31,8 +39,8 @@ ret
 
 ;tempo p ler as instruções
 tempoMaior:
-    mov bp, 10000
-	mov dx, 10000
+    mov bp, 30000
+	mov dx, 30000
 	delayTela1:
 		dec bp
 		nop
@@ -52,8 +60,109 @@ telaCarregar:
     ;escolhe a cor da tela
     mov ah, 0xb 
     mov bh, 0
-    mov bl, 2;cor da tela
+    mov bl, 9;cor da tela
     int 10h
+
+    ;regras do jogo (texto na tela)
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 1
+	mov dl, 13
+	int 10h
+
+    mov si, texto1
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;regra 1
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 5
+	mov dl, 0
+	int 10h
+
+    mov si, texto2
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;regra 2
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 9
+	mov dl, 0
+	int 10h
+
+    mov si, texto3
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;regra 3
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 12
+	mov dl, 0
+	int 10h
+
+    mov si, texto4
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;regra 4
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 16
+	mov dl, 0
+	int 10h
+
+    mov si, texto5
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;regra 5
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 20
+	mov dl, 0
+	int 10h
+
+    mov si, texto6
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;VERDE
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 14
+	mov dl, 1
+	int 10h
+
+    mov si, verde
+    mov bl, 2 ;cor do nome escrito
+    call prints
+
+    ;AMARELO
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 18
+	mov dl, 3
+	int 10h
+
+    mov si, amarelo
+    mov bl, 14 ;cor do nome escrito
+    call prints
+
+    ;VERMELHO
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 21
+	mov dl, 16
+	int 10h
+
+    mov si, vermelho
+    mov bl, 4 ;cor do nome escrito
+    call prints
+
+
 
 putchar:
   mov ah, 0x0e
