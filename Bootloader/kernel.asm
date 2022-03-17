@@ -2,9 +2,11 @@ org 0x8600
 jmp 0x0000:start
 
 data:
-    emptyString times 7 db '______',0
+    emptyString times 7 db '------',0
     chosenWord times 7 db 'ENIGMA',0
-    writenString times 7 db 0
+    congrats times 14 db 'UAU! Acertou!',0
+    ncongrats times 17 db 'Tente Novamente!',0
+    writtenString times 7 db 0
 
 readchar:
   mov ah, 0x00
@@ -123,7 +125,8 @@ startVideo:
 
     mov ah, 02h
     mov bh, 01h
-    mov dl, 17
+    mov dl, 17 ;Aqui coloca os "___" do jogo horizontalmente
+    mov dh, 8  ;Aqui coloca os "___" do jogo verticalmente
     int 10h
 
     ret
@@ -139,7 +142,7 @@ prints:             ; mov si, string
   ret
 
 checkWord:
-  mov si, writenString
+  mov si, writtenString
   xor cx, cx
   push cx
   
@@ -238,18 +241,41 @@ round:
     
     call lineBegin
 
-    mov di, writenString
+    mov di, writtenString
     call readString
 
     call lineBegin
     call checkWord
 
+    ; PCGR PCGR PCGR PCGR -----------------------------------------------------------
+
+    lea si, chosenWord
+    lea di, writtenString
+    dec di
+
+    compare:
+      inc di ; di -> proximo char da writtenString
+      lodsb  ; carrega al com o proximo char da chosenWord
+
+      cmp [di], al
+      jne NotEqual ;se não for igual sai do loop
+
+      cmp al, 0    ;sao os mesmo chars, mas chegou no final da string?
+      jne compare  ;entao vai pro loop novamente
+
+      lea dx, congrats  ;se chegou aqui, é igual
+      mov ah, 9         ;printar parabens
+      int 21h
+      call end_compare
+
+    end_compare:
+    ret
+
+  NotEqual:
     call endl
-    call lineBegin
-
+    ;call lineBegin
     jmp round;
-
-
+ ; ----------------------------------------------------------------------- PCGR PCGR PCGR -------------------------------------------------
 
 start:
     xor ax, ax
