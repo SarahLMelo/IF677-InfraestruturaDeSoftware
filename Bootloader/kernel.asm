@@ -273,7 +273,7 @@ round:
 
   NotEqual:
     call endl
-    ;call lineBegin
+    call lineBegin
     jmp round;
  ; ----------------------------------------------------------------------- PCGR PCGR PCGR -------------------------------------------------
 
