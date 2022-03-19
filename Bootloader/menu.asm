@@ -1,18 +1,20 @@
 org 0x7E00
 jmp 0x0000:start
 
-    nomeJogo times 9 db 'AMGINE', 0
+    nomeJogo times 9 db 'CODIGO.OOO', 0
     inicio db 'Pressione ENTER para iniciar', 0
     pcGenio db '          -----', 0 
     texto1 db 'Regras do jogo:', 0
-    texto2 db '1- Voce possui 6 tentativas para acertar a palavra secreta', 0
+    texto2 db '1- Voce possui 6 tentativas para acertar o codigo', 0
     texto3 db '2- A palavra possui todas as letras      diferentes!', 0
-    texto4 db '3- Se a palavra possuir a letra e ela   estiver no lugar certo, sera pintada de', 0
-    texto5 db '4- Se a palavra possuir a letra mas ela estiver no lugar errado, sera pintada   de', 0
-    texto6 db '5- Se a palavra nao possuir a letra,    sera pintada de', 0
+    texto4 db '3- Se a letra estiver no local certo     sera pintada de', 0
+    texto5 db '4- Se a letra estiver no local errado    sera pintada de ', 0
+    texto6 db '5- Se nao tiver a letra, sera pintada de ', 0
     verde db 'VERDE', 0
     amarelo db 'AMARELO', 0
     vermelho db 'VERMELHO', 0
+    segredo db 'e ficara oculta', 0
+    cuidado db 'ENTER para pular', 0
 
 
 prints:             ; mov si, string
@@ -37,22 +39,9 @@ tempoCarregar:
 
 ret
 
-;tempo p ler as instruções
-tempoMaior:
-    mov bp, 30000
-	mov dx, 30000
-	delayTela1:
-		dec bp
-		nop
-		jnz delayTela1
-	dec dx
-	jnz delayTela1
-
-ret
-
 ;tela p escrever as instruções
 telaCarregar:
- ;inicia modo de video
+    ;inicia modo de video
     mov ah, 0 
     mov al, 13
     int 10h
@@ -132,35 +121,71 @@ telaCarregar:
     ;VERDE
     mov ah, 02h
 	mov bh, 00h
-	mov dh, 14
-	mov dl, 1
+	mov dh, 13
+	mov dl, 14
 	int 10h
 
     mov si, verde
-    mov bl, 2 ;cor do nome escrito
+    mov bl, 10 ;cor do nome escrito
     call prints
 
     ;AMARELO
     mov ah, 02h
 	mov bh, 00h
-	mov dh, 18
-	mov dl, 3
+	mov dh, 17
+	mov dl, 17
 	int 10h
 
     mov si, amarelo
     mov bl, 14 ;cor do nome escrito
     call prints
 
+    ;segredo
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 17
+	mov dl, 25
+	int 10h
+
+    mov si, segredo
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+
+
     ;VERMELHO
     mov ah, 02h
 	mov bh, 00h
 	mov dh, 21
-	mov dl, 16
+	mov dl, 1
 	int 10h
 
     mov si, vermelho
-    mov bl, 4 ;cor do nome escrito
+    mov bl, 12 ;cor do nome escrito
     call prints
+
+    ;segredo
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 21
+	mov dl, 10
+	int 10h
+
+    mov si, segredo
+    mov bl, 15 ;cor do nome escrito
+    call prints
+
+    ;enter p comecar
+    mov ah, 02h
+	mov bh, 00h
+	mov dh, 23
+	mov dl, 22
+	int 10h
+
+    mov si, cuidado
+    mov bl, 7 ;cor do nome escrito
+    call prints
+
 
 
 
@@ -189,7 +214,7 @@ start:
     mov ah, 02h
 	mov bh, 00h
 	mov dh, 7
-	mov dl, 17
+	mov dl, 14
 	int 10h
 
     mov si, nomeJogo
@@ -229,7 +254,12 @@ enter:
 fim:
     call tempoCarregar
     call telaCarregar
-    call tempoMaior
+    mov ah, 0x00
+    int 16h
+    cmp al, 0x0d
+    je jogo
+    jmp fim
+    
 
 
 jogo:
