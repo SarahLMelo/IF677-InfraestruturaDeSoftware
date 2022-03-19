@@ -4,9 +4,21 @@ jmp 0x0000:start
 data:
     emptyString times 7 db '------',0
     chosenWord times 7 db 'ENIGMA',0
-    congrats times 14 db 'UAU! Acertou!',0
-    ncongrats times 17 db 'Tente Novamente!',0
+    congrats times 14 db 'Uau! Acertou!',0
+    ncongrats times 17 db 'Tente novamente amanha :(',0
     writtenString times 7 db 0
+
+tempoCarregar:
+	mov bp, 3000
+	mov dx, 3000
+	delayTela:
+		dec bp
+		nop
+		jnz delayTela
+	dec dx
+	jnz delayTela
+
+ret
 
 readchar:
   mov ah, 0x00
@@ -23,6 +35,19 @@ putchar: ;mov al, char e mov bl, color
     int 10h
 
     ret
+
+putchar_ast:
+    mov al, '*'
+    mov ah, 09h
+    mov cx, 0x01
+    int 10h
+
+    inc dl
+    mov ah, 02h
+    int 10h
+
+    ret
+
 
 delchar:
     mov ah, 03h
@@ -212,7 +237,7 @@ checkWord:
     inc cx
     push cx
     mov bl, 0x04 ;Deixando vermelho
-    call putchar
+    call putchar_ast
     jmp .loop3
 
   .right:
@@ -226,7 +251,7 @@ checkWord:
     inc cx
     push cx
     mov bl, 0x0E ;Deixando amarelo
-    call putchar
+    call putchar_ast
     jmp .loop3
 
   .endloop3:
@@ -235,6 +260,9 @@ checkWord:
 
 ;ajeitar a condição de parada!
 round:
+    ;xor cx, cx
+    inc cx
+    push cx
     mov si, emptyString
     mov bl, 0x0F
     call prints
@@ -269,12 +297,62 @@ round:
       call end_compare
 
     end_compare:
-    ret
+
+      call tempoCarregar
+      mov ah, 0 
+      mov al, 13
+      int 10h
+
+      ;escolhe a cor da tela
+      mov ah, 0xb 
+      mov bh, 0
+      mov bl, 2;cor da tela
+      int 10h
+
+      ;texto vc ganhou
+      mov ah, 02h
+	    mov bh, 00h
+	    mov dh, 11
+	    mov dl, 13
+	    int 10h
+
+      mov si, congrats
+      mov bl, 15 ;cor do nome escrito
+      call prints
+      ret
 
   NotEqual:
     call endl
     call lineBegin
-    jmp round;
+    pop cx
+    cmp cx, 6
+    jne round
+      ;perdeu o jogo
+      call tempoCarregar
+      mov ah, 0 
+      mov al, 13
+      int 10h
+
+      ;escolhe a cor da tela
+      mov ah, 0xb 
+      mov bh, 0
+      mov bl, 4;cor da tela
+      int 10h
+
+      ;texto vc perdeu
+      mov ah, 02h
+	    mov bh, 00h
+	    mov dh, 11
+	    mov dl, 7
+	    int 10h
+
+      mov si, ncongrats
+      mov bl, 15 ;cor do nome escrito
+      call prints
+
+
+      ret
+
  ; ----------------------------------------------------------------------- PCGR PCGR PCGR -------------------------------------------------
 
 start:
