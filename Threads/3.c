@@ -50,12 +50,12 @@ void *solve(void *arg){ //Função que vai fazer as contas no método Jacobi, ba
         if(A[k][k]) xUpdate[i] = (1/A[k][k]) * (b[k] - sum);
         else xUpdate[i] = 0;
     }
-    pthread_barrier_wait((*myArgs).barrier);
-    for(int i=0; i<(*myArgs).numberOfI; i++) x[(*myArgs).i[i]] = xUpdate[i];
+    pthread_barrier_wait((*myArgs).barrier); //Colocando a thread na barreira
+    for(int i=0; i<(*myArgs).numberOfI; i++) x[(*myArgs).i[i]] = xUpdate[i]; //Fazendo o update do x
 
 }
 
-void *vazio(void *arg){
+void *vazio(void *arg){ //Função das threads desnecessárias, ela só existe para completar a barreira já que tive que criar a thread anyways
     threadArgs *myArgs = (threadArgs *) arg;
     pthread_barrier_wait((*myArgs).barrier);
 }
@@ -104,14 +104,14 @@ int main(){
             //fflush(stdin);
         }
 
-        for(int i=0; i<n; i++) pthread_join(threads[i], NULL);
+        for(int i=0; i<n; i++) pthread_join(threads[i], NULL); //Esperando todo mundo acabar para começar a próxima iteração
         k++;
     }
 
-    for(int i=0; i<size; i++) printf("%lf ", x[i]);
+    for(int i=0; i<size; i++) printf("%lf ", x[i]); //Printando o array x no final
     printf("\n");
 
-    pthread_barrier_destroy(&barrier);
+    pthread_barrier_destroy(&barrier); //Destruindo a barreira que construimos pois não vamos mais precisar dela
 
     return 0;
 }
