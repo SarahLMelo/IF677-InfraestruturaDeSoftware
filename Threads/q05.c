@@ -11,6 +11,9 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t empty = PTHREAD_COND_INITIALIZER;
 pthread_cond_t full = PTHREAD_COND_INITIALIZER;
 
+int num_thread_C_global;
+int num_threads_P_global;
+
 
 typedef struct elem {
     int value;
@@ -42,7 +45,7 @@ void putBlockingQueue(BlockingQueue* Q, int newValue){
     //se a fila estiver cheia, coloco os produtores p dormir e libero o mutex
     while(Q->statusBuffer == Q->sizeBuffer){
         printf("A fila esta cheia!\n");
-        pthread_cond_wait(&empty, &mutex); //colocando os produtores p dormir e liberando  mutex
+        pthread_cond_wait(&empty, &mutex); 
     }
 
     //criando o novo no
@@ -68,7 +71,7 @@ void putBlockingQueue(BlockingQueue* Q, int newValue){
     if(Q->statusBuffer == 1)
         pthread_cond_broadcast(&full);
 
-    pthread_mutex_unlock(&mutex); //se chego no final, tenho q liberar o mutex!)
+    pthread_mutex_unlock(&mutex);
 
 }
 
@@ -104,7 +107,7 @@ int takeBlockingQueue(BlockingQueue* Q){
     if(Q->statusBuffer == Q->sizeBuffer - 1) 
         pthread_cond_signal(&empty);
 
-    pthread_mutex_unlock(&mutex); //chegou no final, libero o mutex
+    pthread_mutex_unlock(&mutex);
 
     return item_retirado;
 }
@@ -118,6 +121,7 @@ void *producer(void *queue){
         putBlockingQueue(Q, valor);
         valor++;
     }
+
 
     pthread_exit(NULL);
     
@@ -147,11 +151,20 @@ int main(){
     for(int i=0; i < threads_C; i++)  
         pthread_create(&consumer_threads[i], NULL, consumer, (void *) Queue);    
 
-    for(int i=0; i < threads_P; i++)
+    for(int i=0; i < threads_C; i++)
         pthread_create(&producer_threads[i], NULL, producer, (void*) Queue);
     
 
+
     pthread_exit(NULL);
+
+    //mesmo o código sendo "infinito", irei dar free nas estruturas criadas!
+    
+    free(Queue);
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&empty);
+    pthread_mutex_destroy(&full);
+
 
     return 0;
 
