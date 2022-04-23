@@ -11,9 +11,6 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t empty = PTHREAD_COND_INITIALIZER;
 pthread_cond_t full = PTHREAD_COND_INITIALIZER;
 
-int num_thread_C_global;
-int num_threads_P_global;
-
 
 typedef struct elem {
     int value;
