@@ -42,7 +42,7 @@ void putBlockingQueue(BlockingQueue* Q, int newValue){
     //se a fila estiver cheia, coloco os produtores p dormir e libero o mutex
     while(Q->statusBuffer == Q->sizeBuffer){
         printf("A fila esta cheia!\n");
-        pthread_cond_wait(&empty, &mutex); 
+        pthread_cond_wait(&empty, &mutex); //colocando os produtores p dormir e liberando  mutex
     }
 
     //criando o novo no
@@ -68,7 +68,7 @@ void putBlockingQueue(BlockingQueue* Q, int newValue){
     if(Q->statusBuffer == 1)
         pthread_cond_broadcast(&full);
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex); //se chego no final, tenho q liberar o mutex!)
 
 }
 
@@ -104,7 +104,7 @@ int takeBlockingQueue(BlockingQueue* Q){
     if(Q->statusBuffer == Q->sizeBuffer - 1) 
         pthread_cond_signal(&empty);
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex); //chegou no final, libero o mutex
 
     return item_retirado;
 }
@@ -147,7 +147,7 @@ int main(){
     for(int i=0; i < threads_C; i++)  
         pthread_create(&consumer_threads[i], NULL, consumer, (void *) Queue);    
 
-    for(int i=0; i < threads_C; i++)
+    for(int i=0; i < threads_P; i++)
         pthread_create(&producer_threads[i], NULL, producer, (void*) Queue);
     
 
