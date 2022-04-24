@@ -119,6 +119,7 @@ void *producer(void *queue){
         valor++;
     }
 
+
     pthread_exit(NULL);
     
 }
@@ -151,7 +152,16 @@ int main(){
         pthread_create(&producer_threads[i], NULL, producer, (void*) Queue);
     
 
+
     pthread_exit(NULL);
+
+    //mesmo o código sendo "infinito", irei dar free nas estruturas criadas!
+    
+    free(Queue);
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&empty);
+    pthread_mutex_destroy(&full);
+
 
     return 0;
 
